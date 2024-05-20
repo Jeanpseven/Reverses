@@ -1,5 +1,34 @@
 #!/bin/bash
 
+# Função para verificar e instalar o apktool
+install_apktool() {
+  if ! command -v apktool &> /dev/null; then
+    echo "apktool não está instalado. Instalando agora..."
+    
+    # Baixar o apktool
+    wget https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool
+    wget https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool.jar
+
+    # Mover para /usr/local/bin e tornar executável
+    sudo mv apktool /usr/local/bin
+    sudo mv apktool.jar /usr/local/bin
+    sudo chmod +x /usr/local/bin/apktool
+
+    # Verificar se a instalação foi bem-sucedida
+    if command -v apktool &> /dev/null; then
+      echo "apktool instalado com sucesso."
+    else
+      echo "Falha ao instalar o apktool."
+      exit 1
+    fi
+  else
+    echo "apktool já está instalado."
+  fi
+}
+
+# Instalar o apktool se necessário
+install_apktool
+
 # Prompt the user for the file path or name
 echo "Enter the path or name of the file you want to infect (e.g. /path/to/file or file):"
 read file
